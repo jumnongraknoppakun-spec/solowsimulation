@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>แบบจำลองการเติบโตของ Solow</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--tx:#1d2330;--mut:#5d667a;--bd:#dde1ea;--y:#2563eb;--i:#16a34a;--d:#dc2626;--ac:#7c3aed;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mut:#99a2b6;--bd:#2d3444;--y:#60a5fa;--i:#4ade80;--d:#f87171;--ac:#a78bfa}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b202b;--tx:#e8ebf2;--mut:#99a2b6;--bd:#2d3444;--y:#60a5fa;--i:#4ade80;--d:#f87171;--ac:#a78bfa}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.65 "Noto Sans Thai","Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:860px;margin:0 auto;padding:16px}
+header{padding:20px 0 8px}
+.who{display:inline-block;font-size:14px;color:var(--mut);border:1px solid var(--bd);border-radius:99px;padding:2px 12px;background:var(--card)}
+h1{font-size:26px;margin:10px 0 4px;line-height:1.3}
+h2{font-size:19px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0}
+p{margin:6px 0}
+.eq{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;overflow-x:auto;white-space:nowrap;margin:8px 0}
+ul{margin:6px 0;padding-left:20px}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.ctl label{display:block;font-size:14px;color:var(--mut)}
+.ctl b{color:var(--tx);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.chart{overflow-x:auto}
+svg{width:100%;height:auto;min-width:420px;display:block}
+svg text{fill:var(--mut);font-size:12px;font-family:inherit}
+.lg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;margin-top:6px}
+.lg i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px;border-radius:2px}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.box{border:1px solid var(--bd);border-radius:12px;padding:12px;text-align:center;background:var(--bg)}
+.box small{color:var(--mut);display:block}
+.box strong{font-size:26px;font-variant-numeric:tabular-nums}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+button{font:inherit;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--ac);color:#fff}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+#cmp{margin-top:8px;padding:12px;border-radius:10px;background:var(--bg);border:1px dashed var(--bd);display:none}
+.up{color:var(--i);font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left}
+</style>
+</head>
+<body>
+<div class="w">
+<header>
+<span class="who">นางสาวสุนิตา อินมนเทียน · รหัสนักศึกษา 661810276</span>
+<h1>แบบจำลองการเติบโตของ Solow</h1>
+<p style="color:var(--mut)">รูปที่ง่ายที่สุด: Y = A√K · ปรับค่าพารามิเตอร์แล้วดูกราฟและสภาวะคงตัวเปลี่ยนตามทันที</p>
+</header>
+
+<section class="card">
+<h2>1. คำอธิบายแบบจำลอง</h2>
+<div class="eq">Y = A√K &nbsp; I = sY &nbsp; D = δK &nbsp; ΔK = sY − δK</div>
+<p><b>Y = A√K</b> คือฟังก์ชันผลผลิตต่อแรงงานที่มีประสิทธิภาพ (รูปย่อของ Y = f(K, eL, A)) โดย K คือทุนต่อแรงงานที่มีประสิทธิภาพ และ A คือระดับเทคโนโลยี ความรู้ และนวัตกรรม รากที่สองแสดงว่าทุนมีผลิตภาพส่วนเพิ่มลดลง: เพิ่มทุนทีละหน่วยแล้วผลผลิตเพิ่มน้อยลงเรื่อยๆ ส่วน A ทำหน้าที่ขยายผลผลิตจากทุนจำนวนเท่าเดิม</p>
+<ul>
+<li><b>s (อัตราการออม):</b> ยิ่งสูง การลงทุน sY ยิ่งมาก เส้นการลงทุนเลื่อนขึ้น ทุนเพิ่มได้มากขึ้น</li>
+<li><b>δ (อัตราค่าเสื่อม):</b> ยิ่งสูง ค่าเสื่อม δK ยิ่งมาก เส้นชันขึ้น ทุนลดลงมากขึ้น</li>
+<li><b>A (เทคโนโลยี):</b> ยิ่งสูง ผลผลิต Y และการลงทุน sY ยิ่งสูงที่ทุกระดับ K ทุนจึงเพิ่มได้มากขึ้น</li>
+</ul>
+<p>เมื่อ sY &gt; δK ทุนเพิ่มขึ้น เมื่อ sY &lt; δK ทุนลดลง และเมื่อ sY = δK ระบบอยู่ที่สภาวะคงตัว: K* = (sA/δ)², Y* = sA²/δ, C* = (1 − s)Y*</p>
+</section>
+
+<section class="card">
+<h2>2. กราฟ (แกนนอน = ทุน K)</h2>
+<div class="ctl">
+<div><label>s อัตราการออม: <b id="vs"></b></label><input id="s" type="range" min="0.05" max="0.6" step="0.005"></div>
+<div><label>δ อัตราค่าเสื่อม: <b id="vd"></b></label><input id="d" type="range" min="0.01" max="0.1" step="0.001"></div>
+<div><label>A เทคโนโลยี: <b id="vA"></b></label><input id="A" type="range" min="1" max="6" step="0.05"></div>
+</div>
+<div class="chart"><svg id="g" viewBox="0 0 640 400" role="img" aria-label="กราฟ Solow"></svg></div>
+<div class="lg">
+<span><i style="background:var(--y)"></i>ผลผลิต Y = A√K</span>
+<span><i style="background:var(--i)"></i>การลงทุน sY</span>
+<span><i style="background:var(--d)"></i>ค่าเสื่อม δK</span>
+<span style="color:var(--mut)">เส้นประ = ก่อนใช้ AI</span>
+</div>
+</section>
+
+<section class="card">
+<h2>3. ผลที่สภาวะคงตัว</h2>
+<div class="res">
+<div class="box"><small>K*</small><strong id="rK"></strong></div>
+<div class="box"><small>Y*</small><strong id="rY"></strong></div>
+<div class="box"><small>C*</small><strong id="rC"></strong></div>
+</div>
+</section>
+
+<section class="card">
+<h2>4. สถานการณ์เศรษฐกิจดิจิทัล</h2>
+<p>จำลองว่าประเทศไทยนำ AI มาใช้ ทำให้ระดับเทคโนโลยี A เพิ่มขึ้น 20% (จากค่าเดิมก่อนกดปุ่ม)</p>
+<div class="btns">
+<button id="ai">🤖 ไทยนำ AI มาใช้ (A +20%)</button>
+<button id="rs" class="g">รีเซ็ตเป็นค่าเริ่มต้น</button>
+</div>
+<div id="cmp"></div>
+</section>
+
+</div>
+
+<script>
+var D0={s:0.32,d:0.034,A:2.6},P=Object.assign({},D0),G=null;
+var $=function(i){return document.getElementById(i)};
+function sol(p){var K=Math.pow(p.s*p.A/p.d,2),Y=p.A*Math.sqrt(K);return{K:K,Y:Y,C:(1-p.s)*Y}}
+function f(v){return v>=100?v.toFixed(0):v>=10?v.toFixed(1):v.toFixed(2)}
+function draw(){
+ var a=sol(P),b=G?sol(G):a,xm=1.5*Math.max(a.K,b.K);
+ var ym=1.08*Math.max(P.A,G?G.A:0)*Math.sqrt(xm);
+ var L=58,R=16,T=14,B=42,W=640,H=400,pw=W-L-R,ph=H-T-B;
+ var X=function(k){return L+k/xm*pw},Yv=function(y){return T+ph-y/ym*ph};
+ var h='';
+ for(var i=0;i<=5;i++){
+  var gx=L+pw*i/5,gy=T+ph*i/5;
+  h+='<line x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+(T+ph)+'" stroke="var(--bd)" stroke-width="0.6"/>';
+  h+='<line x1="'+L+'" y1="'+gy+'" x2="'+(L+pw)+'" y2="'+gy+'" stroke="var(--bd)" stroke-width="0.6"/>';
+  h+='<text x="'+gx+'" y="'+(T+ph+16)+'" text-anchor="middle">'+f(xm*i/5)+'</text>';
+  h+='<text x="'+(L-6)+'" y="'+(gy+4)+'" text-anchor="end">'+f(ym*(5-i)/5)+'</text>';
+ }
+ h+='<text x="'+(L+pw/2)+'" y="'+(H-6)+'" text-anchor="middle">ทุน K</text>';
+ function curve(fn,col,dash,w){
+  var d='';for(var j=0;j<=120;j++){var k=xm*j/120;d+=(j?'L':'M')+X(k).toFixed(1)+' '+Yv(fn(k)).toFixed(1)}
+  return '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="6 5" opacity="0.55"':'')+'/>';
+ }
+ function set(p,dash){
+  return curve(function(k){return p.A*Math.sqrt(k)},'var(--y)',dash,dash?2:3)+
+   curve(function(k){return p.s*p.A*Math.sqrt(k)},'var(--i)',dash,dash?2:3)+
+   curve(function(k){return p.d*k},'var(--d)',dash,dash?2:3);
+ }
+ if(G)h+=set(G,true);
+ h+=set(P,false);
+ var px=X(a.K),py=Yv(P.s*a.Y);
+ h+='<line x1="'+px+'" y1="'+py+'" x2="'+px+'" y2="'+(T+ph)+'" stroke="var(--ac)" stroke-dasharray="4 4"/>';
+ h+='<line x1="'+L+'" y1="'+py+'" x2="'+px+'" y2="'+py+'" stroke="var(--ac)" stroke-dasharray="4 4"/>';
+ h+='<circle cx="'+px+'" cy="'+py+'" r="6" fill="var(--ac)"/>';
+ var tx=px>pw*0.7?px-8:px+10,an=px>pw*0.7?'end':'start';
+ h+='<text x="'+tx+'" y="'+(py-10)+'" text-anchor="'+an+'" style="fill:var(--ac);font-weight:700">K* = '+a.K.toFixed(3)+'</text>';
+ h+='<text x="'+(L+8)+'" y="'+(T+ph-8)+'" style="font-size:11px">K &lt; K*: sY &gt; δK ทุนเพิ่ม</text>';
+ h+='<text x="'+(L+pw-6)+'" y="'+(T+ph-8)+'" text-anchor="end" style="font-size:11px">K &gt; K*: sY &lt; δK ทุนลด</text>';
+ $('g').innerHTML=h;
+}
+function upd(){
+ $('vs').textContent=P.s.toFixed(3);$('vd').textContent=P.d.toFixed(3);$('vA').textContent=P.A.toFixed(2);
+ ['s','d','A'].forEach(function(k){$(k).value=P[k]});
+ var r=sol(P);
+ $('rK').textContent=r.K.toFixed(3);$('rY').textContent=r.Y.toFixed(3);$('rC').textContent=r.C.toFixed(3);
+ var c=$('cmp');
+ if(G){var o=sol(G),pc=function(n,m){return((n/m-1)*100).toFixed(2)+'%'};
+  c.style.display='block';
+  c.innerHTML='<table><tr><th></th><th>ก่อน (A = '+G.A.toFixed(2)+')</th><th>หลัง (A = '+P.A.toFixed(2)+')</th><th>เปลี่ยน</th></tr>'+
+  '<tr><td>Y*</td><td>'+o.Y.toFixed(3)+'</td><td>'+r.Y.toFixed(3)+'</td><td class="up">'+(r.Y-o.Y>=0?'+':'')+(r.Y-o.Y).toFixed(3)+' ('+pc(r.Y,o.Y)+')</td></tr>'+
+  '<tr><td>K*</td><td>'+o.K.toFixed(3)+'</td><td>'+r.K.toFixed(3)+'</td><td>'+pc(r.K,o.K)+'</td></tr>'+
+  '<tr><td>C*</td><td>'+o.C.toFixed(3)+'</td><td>'+r.C.toFixed(3)+'</td><td>'+pc(r.C,o.C)+'</td></tr></table>';
+ }else c.style.display='none';
+ draw();
+}
+['s','d','A'].forEach(function(k){$(k).addEventListener('input',function(e){P[k]=parseFloat(e.target.value);upd()})});
+$('ai').onclick=function(){if(!G)G=Object.assign({},P);P.A=Math.min(6,G.A*1.2);upd()};
+$('rs').onclick=function(){P=Object.assign({},D0);G=null;upd()};
+upd();
+</script>
+</body>
+</html>
